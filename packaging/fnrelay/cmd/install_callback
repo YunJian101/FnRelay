@@ -1,0 +1,9 @@
+#!/bin/bash
+
+### 安装完成：准备数据目录与可执行权限
+
+mkdir -p "${TRIM_PKGVAR}/certs" 2>/dev/null
+chmod 700 "${TRIM_PKGVAR}" "${TRIM_PKGVAR}/certs" 2>/dev/null
+chmod +x "${TRIM_APPDEST}/server/fnrelay" 2>/dev/null
+
+exit 0

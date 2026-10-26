@@ -1,0 +1,124 @@
+#!/bin/bash
+
+APP_DIR="${TRIM_APPDEST}"
+DATA_DIR="${TRIM_PKGVAR}"
+PID_FILE="${DATA_DIR}/fnrelay.pid"
+LOG_DIR="${DATA_DIR}/logs"
+LOG_FILE="${LOG_DIR}/fnrelay.log"
+SOCKET="${APP_DIR}/app.sock"
+BIN="${APP_DIR}/server/fnrelay"
+
+log_msg() {
+    mkdir -p "${LOG_DIR}" 2>/dev/null
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $*" >> "${LOG_FILE}"
+}
+
+is_running() {
+    if [ ! -f "${PID_FILE}" ]; then
+        return 1
+    fi
+    local pid
+    pid=$(head -n 1 "${PID_FILE}" 2>/dev/null | tr -d '[:space:]')
+    if [ -n "${pid}" ] && kill -0 "${pid}" 2>/dev/null; then
+        return 0
+    fi
+    rm -f "${PID_FILE}"
+    return 1
+}
+
+start_process() {
+    if is_running; then
+        log_msg "already running"
+        return 0
+    fi
+    if [ ! -f "${BIN}" ]; then
+        echo "FnRelay 程序文件缺失：${BIN}" > "${TRIM_TEMP_LOGFILE:-/dev/null}"
+        exit 1
+    fi
+    mkdir -p "${DATA_DIR}" "${LOG_DIR}" || {
+        echo "无法创建数据目录：${DATA_DIR}" > "${TRIM_TEMP_LOGFILE:-/dev/null}"
+        exit 1
+    }
+    chmod 700 "${DATA_DIR}" "${LOG_DIR}" 2>/dev/null
+    chmod +x "${BIN}" 2>/dev/null
+    if [ -f "${DATA_DIR}/fnrelay.log" ] && [ ! -f "${LOG_FILE}" ]; then
+        mv -f "${DATA_DIR}/fnrelay.log" "${LOG_FILE}" 2>/dev/null
+    fi
+
+    if [ -f "${LOG_FILE}" ]; then
+        local size
+        size=$(stat -c%s "${LOG_FILE}" 2>/dev/null || echo 0)
+        if [ "${size}" -gt 5242880 ]; then
+            mv -f "${LOG_FILE}" "${LOG_FILE}.1"
+        fi
+    fi
+
+    ulimit -n 65535 2>/dev/null || true
+    cd "${DATA_DIR}" || exit 1
+    rm -f "${SOCKET}"
+    nohup "${BIN}" --data "${DATA_DIR}" \
+        --gateway-socket "${SOCKET}" --gateway-prefix "/app/fnrelay" \
+        >> "${LOG_FILE}" 2>&1 < /dev/null &
+    echo $! > "${PID_FILE}"
+    log_msg "starting pid $(cat "${PID_FILE}") gateway /app/fnrelay"
+
+    local i
+    for i in $(seq 1 40); do
+        if [ -S "${SOCKET}" ] && kill -0 "$(cat "${PID_FILE}")" 2>/dev/null; then
+            log_msg "started"
+            return 0
+        fi
+        sleep 0.25
+    done
+
+    echo "FnRelay 启动超时，请查看日志：${LOG_FILE}" > "${TRIM_TEMP_LOGFILE:-/dev/null}"
+    log_msg "start timeout"
+    kill "$(cat "${PID_FILE}")" 2>/dev/null
+    rm -f "${PID_FILE}" "${SOCKET}"
+    exit 1
+}
+
+stop_process() {
+    if ! is_running; then
+        rm -f "${PID_FILE}"
+        return 0
+    fi
+    local pid count
+    pid=$(head -n 1 "${PID_FILE}" | tr -d '[:space:]')
+    log_msg "stopping pid ${pid}"
+    kill -TERM "${pid}" 2>/dev/null
+    count=0
+    while kill -0 "${pid}" 2>/dev/null && [ "${count}" -lt 20 ]; do
+        sleep 0.5
+        count=$((count + 1))
+    done
+    if kill -0 "${pid}" 2>/dev/null; then
+        kill -KILL "${pid}" 2>/dev/null
+    fi
+    rm -f "${PID_FILE}" "${SOCKET}"
+    log_msg "stopped"
+    return 0
+}
+
+case "$1" in
+    start)
+        start_process
+        ;;
+    stop)
+        stop_process
+        ;;
+    restart)
+        stop_process
+        start_process
+        ;;
+    status)
+        if is_running; then
+            exit 0
+        else
+            exit 3
+        fi
+        ;;
+    *)
+        exit 1
+        ;;
+esac

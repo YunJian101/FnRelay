@@ -1,0 +1,16 @@
+﻿appname               = fnrelay
+version               = 1.0.24
+display_name          = FnRelay 反代
+desc                  = 飞牛原生反向代理：只通过飞牛桌面内嵌（统一网关 /app/fnrelay）访问，不开放独立网页端口，也不需要 FnRelay 密码；单个端口同时处理 HTTP 与 HTTPS，自动加载飞牛证书并按域名匹配，支持泛域名、HTTP→HTTPS 跳转、亮色/暗色主题，以及可选的本地访问/审核日志（按天、最长 7 天）。
+platform              = x86
+source                = thirdparty
+maintainer            = FnRelay
+maintainer_url        = https://github.com/
+distributor           = FnRelay
+desktop_uidir         = ui
+desktop_applaunchname = fnrelay.main
+os_min_version        = 0.9.0
+disable_authorization_path = true
+changelog             = 1.0.24：概览「活动连接」改为真实的活动请求数，和实时页使用同一份内存数据；长视频播放期间不再显示 0。运行时长文案改为「进程运行」，明确是 FnRelay 进程启动时间。
+
+

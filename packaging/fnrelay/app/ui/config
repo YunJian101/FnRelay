@@ -1,0 +1,17 @@
+{
+  ".url": {
+    "fnrelay.main": {
+      "title": "FnRelay 反代",
+      "icon": "images/icon_{0}.png",
+      "type": "iframe",
+      "protocol": "",
+      "gatewayPrefix": "/app/fnrelay",
+      "gatewaySocket": "app.sock",
+      "url": "/app/fnrelay",
+      "allUsers": false,
+      "control": {
+        "accessPerm": "readonly"
+      }
+    }
+  }
+}

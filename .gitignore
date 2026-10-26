@@ -1,0 +1,28 @@
+# Build / local runtime
+build/
+testdata/
+src/devdata/
+*.exe
+*.log
+
+# Local-only version archive and scaffolding
+archive/
+scaffold/
+
+# Bundled build toolchain (too large for Git)
+tools/go/
+tools/fnpack.exe
+tools/gettools.py
+tools/*.ps1
+
+# Test artifacts
+edge-shots/
+edge-profile/
+__pycache__/
+*.pyc
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

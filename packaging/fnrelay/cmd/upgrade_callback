@@ -1,0 +1,7 @@
+#!/bin/bash
+
+### 升级完成：恢复可执行权限
+
+chmod +x "${TRIM_APPDEST}/server/fnrelay" 2>/dev/null
+
+exit 0

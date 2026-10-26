@@ -1,0 +1,10 @@
+#!/bin/bash
+
+### 安装前检查：确认程序文件与运行环境
+
+if [ "$(uname -m)" != "x86_64" ] && [ "$(uname -m)" != "aarch64" ]; then
+    echo "当前设备架构 $(uname -m) 不受支持。" > "${TRIM_TEMP_LOGFILE:-/dev/null}"
+    exit 1
+fi
+
+exit 0
