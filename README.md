@@ -4,7 +4,7 @@
 
 ![Version](https://img.shields.io/badge/version-1.0.24-34d399)
 ![Platform](https://img.shields.io/badge/platform-fnOS-0ea5e9)
-![License](https://img.shields.io/badge/license-MIT-8b5cf6)
+![License](https://img.shields.io/badge/license-GPL--3.0-8b5cf6)
 
 FnRelay 以 `.fpk` 形式安装在飞牛 OS 上，不额外开放管理网页端口，也不需要 FnRelay 密码。权限直接使用飞牛统一网关转发的管理员身份，从飞牛桌面点图标即可打开。
 
@@ -84,13 +84,7 @@ dist/SHA256SUMS.txt
 
 ### 从旧版本升级
 
-如果应用中心返回 `10236`，执行：
-
-```text
-卸载 FnRelay（保留数据）→ 安装新版本 fpk
-```
-
-配置、规则、证书都在 `@appdata/fnrelay`，不会因为卸载应用而丢失。
+如果应用中心不允许直接覆盖升级，先卸载 FnRelay（保留数据），再安装新版本 fpk。配置、规则、证书都在 `@appdata/fnrelay`，不会因为卸载应用而丢失。
 
 ## 快速开始
 
@@ -151,4 +145,4 @@ python build.py --arch x86 # 只打 x86
 
 ## License
 
-[MIT](LICENSE)
+[GPL-3.0](LICENSE)
